@@ -102,7 +102,7 @@ MIDDLEWARE_CLASSES = (
     "debug_toolbar.middleware.DebugToolbarMiddleware",
 )
 
-ROOT_URLCONF = 'stratusproject.urls'
+ROOT_URLCONF = 'stratus-project.urls'
 
 TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
