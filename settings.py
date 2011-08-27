@@ -150,6 +150,6 @@ LOGGING = {
 
 #------------------------------  STRATUS
 REPOS = {
-    "local": "/Users/kamil/Desktop/PROJECTOS/stratus/env/src/stratus/.git",
+    "local": PROJECT_PATH,
 }
 
