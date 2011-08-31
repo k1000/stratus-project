@@ -2,7 +2,7 @@
 import os
 PROJECT_PATH = os.path.realpath(os.path.dirname(__file__))
 DEBUG = True
-#TEMPLATE_DEBUG = DEBUG
+TEMPLATE_DEBUG = False
 
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
@@ -150,6 +150,6 @@ LOGGING = {
 
 #------------------------------  STRATUS
 REPOS = {
-    "local": "/Users/kamil/Desktop/PROJECTOS/stratus/env/src/stratus/.git",
+    "local": PROJECT_PATH,
 }
 
