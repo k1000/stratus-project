@@ -1,0 +1,66 @@
+      <div id="connect">
+        <form action="#">
+          <fieldset> 
+
+            <label for="nick">Name</label>
+            <input id="nickInput" class="text" type="text" name="nick" value="{{ user }}"/>
+            <input id="connectButton" class="button" type="submit" name="" value="Join"/>
+
+          </fieldset>
+        </form>
+      </div>
+      <div id="loading"><p>loading</p></div>
+      <div id="log">
+        <table class="message"><tr><td class="date">18:58</td><td valign="top" class="nick">TTilus</td>
+         <td class="msg-text">x6a616e: i think you can, there was some weird #send trick to do that</td>
+        </tr></table>
+        <table class="message"><tr><td class="date">18:58</td><td valign="top" class="nick">TTilus</td>
+         <td class="msg-text">(or i could just be terribly wrong)</td>
+        </tr></table>
+        <table class="message"><tr><td class="date">19:02</td><td valign="top" class="nick">x6a616e</td>
+         <td class="msg-text">TTilus: with #send you can invoke private methods</td>
+        </tr></table>
+        <table class="message"><tr><td class="date">19:03</td><td valign="top" class="nick">x6a616e</td>
+         <td class="msg-text">dunno how to leverage it to access instance var :-/</td>
+        </tr></table>
+        <table class="message"><tr><td class="date">19:05</td><td valign="top" class="nick">x6a616e</td>
+         <td class="msg-text">i3d: usually I use rspec::mocks</td>
+        </tr></table>
+        <table class="message"><tr><td class="date">19:05</td><td valign="top" class="nick">dlisboa</td>
+         <td class="msg-text">x6a616e: #instance_variable_get ?</td>
+        </tr></table>
+        <table class="message"><tr><td class="date">19:06</td><td valign="top" class="nick">x6a616e</td>
+         <td class="msg-text">dlisboa: phew I forgot that ..</td>
+        </tr></table>
+        <table class="message"><tr><td class="date">19:19</td><td valign="top" class="nick">UrbanVegan</td>
+         <td class="msg-text">How can I use "%" in a string as just another character (meaning "percent")?</td>
+        </tr></table>
+        <table class="message"><tr><td class="date">19:20</td><td valign="top" class="nick">ddfreyne</td>
+         <td class="msg-text">"%"</td>
+        </tr></table>
+        <table class="message"><tr><td class="date">19:20</td><td valign="top" class="nick">ddfreyne</td>
+         <td class="msg-text">:)</td>
+        </tr></table>
+        <table class="message"><tr><td class="date">19:20</td><td valign="top" class="nick">ddfreyne</td>
+         <td class="msg-text">no need to escape it</td>
+        </tr></table>
+        <table class="message"><tr><td class="date">19:20</td><td valign="top" class="nick">dominikh</td>
+         <td class="msg-text">%%</td>
+        </tr></table>
+        <table class="message"><tr><td class="date">19:21</td><td valign="top" class="nick">dominikh</td>
+         <td class="msg-text">ddfreyne: if you use something like "%string" % 1</td>
+        </tr></table>
+        <table class="message"><tr><td class="date">19:21</td><td valign="top" class="nick">dominikh</td>
+         <td class="msg-text">eh</td>
+        </tr></table>
+        
+        
+      </div>
+      <div id="toolbar">
+        <ul id="status">
+          <li><a id="usersLink" href="#">5 users</a></li>
+          <li>uptime: <span id="uptime">?</span></li>
+          <li>memory: <span id="rss">?</span>mb RSS</li>
+        </ul>
+        <input type="text" id="entry"/>
+      </div>

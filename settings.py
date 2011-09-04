@@ -61,7 +61,7 @@ STATIC_ROOT = ''
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
-STATIC_URL = '/static/'
+STATIC_URL = 'http://127.0.0.1:8002/static/'
 
 # URL prefix for admin static files -- CSS, JavaScript and images.
 # Make sure to use a trailing slash.
@@ -123,6 +123,8 @@ INSTALLED_APPS = (
     # 'django.contrib.admindocs',
     'stratus',
     "debug_toolbar",
+    'django_tornado',
+    'chat',
 )
 
 # A sample logging configuration. The only tangible logging
