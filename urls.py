@@ -1,5 +1,5 @@
 from django.conf.urls.defaults import patterns, include, url
-
+from django.conf import settings
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
 admin.autodiscover()
@@ -15,5 +15,13 @@ urlpatterns = patterns('',
     # Uncomment the next line to enable the admin:
     (r'^admin/git/', include('stratus.urls')),
     url(r'^admin/', include(admin.site.urls)),
-    
+    (r'^chat/', include('chat.urls')),
 )
+"""
+if settings.DEBUG:
+    import tornado, os
+
+    urlpatterns += patterns('',    
+        (r"^static/stratus/(.*)", tornado.web.StaticFileHandler, {"path": "/home/kam/Projects/stratus/stratus-project/static/stratus/"}),
+    )
+"""
