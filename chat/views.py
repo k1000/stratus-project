@@ -7,11 +7,11 @@ import tornado.web
 from django_tornado.decorator import asynchronous
 
 #
-#
+CHANNELS = {}
 #
 class Channel(object) :
 
-    def __init__(self, name=None) :
+    def __init__(self, ) :
         self._messages = []
         self._callbacks = []
 
@@ -33,7 +33,6 @@ class Channel(object) :
     def size(self) :
         return 1024
 
-channel = Channel()
 
 class Session(object) :
     SESSIONS = {}
@@ -71,7 +70,12 @@ class Session(object) :
         if id in cls.SESSIONS :
             del Session.SESSIONS[id]
 
-#
+
+def get_channel(name):
+    if name not in CHANNELS.keys():
+        CHANNELS[name]=Channel()
+    
+    return CHANNELS.get( name )
 #
 #
 class ChatResponseError(HttpResponse) :
@@ -98,7 +102,9 @@ def join(request) :
         return ChatResponseError("Bad nickname")
     
     session = Session(nick)
-
+    
+    room_name = request.GET.get("room")
+    channel = get_channel(room_name)
     channel.message('join', nick, "%s joined" % nick)
 
     return ChatResponse({ 
@@ -108,13 +114,15 @@ def join(request) :
                     'starttime': int(time.time()),
             })
 
-def part(request) :
+def part(request ) :
     id = request.GET['id']
 
     session = Session.get(id)
     if not session :
         return ChatResponseError('session expired')
-
+    
+    room_name = request.GET.get("room")
+    channel = get_channel(room_name)
     channel.message('part', session.nick)
 
     Session.remove(id)
@@ -126,18 +134,25 @@ def send(request) :
     session = Session.get(id)
     if not session :
         return ChatResponseError('session expired')
-
+    
+    room_name = request.GET.get("room")
+    channel = get_channel(room_name)
     channel.message('msg', session.nick, request.GET['text'])
 
     return ChatResponse({ 'rss' : channel.size() })
 
 def who(request) :
+    room_name = request.GET.get("room")
+    channel = get_channel(room_name)
     return ChatResponse({ 'nicks': Session.who(), 'rss' : channel.size() })
 
 @asynchronous
-def recv(request, handler) :
+def recv(request, handler, ) :
     response = {}
-
+    
+    room_name = request.GET.get("room")
+    channel = get_channel(room_name)
+    
     if 'since' not in request.GET :
         return ChatResponseError('Must supply since parameter')
     if 'id' not in request.GET :
@@ -149,7 +164,7 @@ def recv(request, handler) :
         session.poke()
 
     since = int(request.GET['since'])
-
+    
     def on_new_messages(messages) :
         if handler.request.connection.stream.closed():
             return
