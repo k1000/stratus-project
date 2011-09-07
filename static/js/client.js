@@ -185,8 +185,8 @@ util = {
 //used to keep the most recent messages visible
 function scrollDown () {
   //window.scrollBy(0, 100000000000000000);
-  var objDiv = document.getElementById("entry");
-  objDiv.scrollTop = objDiv.scrollHeight;
+  var objDiv = document.getElementById("log");
+  objDiv.scrollBottom = objDiv.scrollHeight;
   objDiv.focus();
 }
 
