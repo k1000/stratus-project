@@ -1,5 +1,6 @@
 from django.conf.urls.defaults import patterns, include, url
 from django.conf import settings
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
 admin.autodiscover()
@@ -17,6 +18,9 @@ urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
     (r'^chat/', include('chat.urls')),
 )
+
+urlpatterns += staticfiles_urlpatterns()
+
 """
 if settings.DEBUG:
     import tornado, os
