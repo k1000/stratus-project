@@ -184,8 +184,10 @@ util = {
 
 //used to keep the most recent messages visible
 function scrollDown () {
-  window.scrollBy(0, 100000000000000000);
-  $("#entry").focus();
+  //window.scrollBy(0, 100000000000000000);
+  var objDiv = document.getElementById("entry");
+  objDiv.scrollTop = objDiv.scrollHeight;
+  objDiv.focus();
 }
 
 //inserts an event into the stream for display
