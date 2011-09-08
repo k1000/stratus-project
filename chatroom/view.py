@@ -66,7 +66,13 @@ class ChatConnection(tornadio.SocketConnection):
         else:
             for p in self.participants:
                 p.send(msg)
-
+    
+    def send_private( msg, to):
+        for p in self.participants:
+            if p.nick == to:
+                p.send(msg)
+                return
+                
     def on_close(self):
         self.participants.remove(self)
         self.broadcast( "A user %s has left." % self.nick, self.room )
