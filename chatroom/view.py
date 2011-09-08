@@ -63,7 +63,7 @@ class ChatConnection(tornadio.SocketConnection):
             message = self.join( message )
         
         if "timestamp" not in message:
-            message["timestamp"] = int(time.time())
+            message["timestamp"] = time.time()
 
         if settings.DEBUG:
             print self.participants.keys()
@@ -101,7 +101,8 @@ class ChatConnection(tornadio.SocketConnection):
         ))
         
         channel = get_channel(self.room)
-        self.send( {"messages":channel._messages} )
+        messages = channel._messages
+        self.send( {"messages":messages } )
         return msg
 
     def on_close(self):

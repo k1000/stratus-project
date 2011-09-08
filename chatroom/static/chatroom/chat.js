@@ -48,10 +48,8 @@ function userPart(nick, timestamp) {
 
 //used to keep the most recent messages visible
 function scrollDown () {
-  //window.scrollBy(0, 100000000000000000);
   var objDiv = document.getElementById("log");
-  objDiv.scrollBottom = objDiv.scrollHeight;
-  objDiv.focus();
+  objDiv.scrollTop = objDiv.scrollHeight;
 }
 
 
@@ -101,7 +99,8 @@ util = {
 function addMessage (from, text, time, _class) {
   if (text === null)
     return;
-
+  
+  console.log(time)
   if (time == null) {
     // if the time is null or undefined, use the current time.
     time = new Date();
@@ -141,8 +140,9 @@ function addMessage (from, text, time, _class) {
               ;
   messageElement.html(content);
 
-  //the log is the stream that we view
-  $("#log").append(messageElement);
+  $(messageElement).appendTo( $("#log") )
+      .animate({ backgroundColor: "#FCFCD8" },1).delay(1000).animate({ backgroundColor: "#EFEAEA" }, 1500);
+
 
   //always view the most recent message when it is added
   scrollDown();
@@ -182,9 +182,10 @@ $(document).ready(function() {
     };
     onmessage = function (msg) {
         if ( msg.messages){
-          for (var i = msg.messages.length - 1; i >= 0; i--) {
-            var ms = msg.messages[i];
-            addMessage(ms.nick, ms.msg || "", ms.timestamp, ms.type);
+          messages = msg.messages.reverse();
+          for (var i = messages.length - 1; i >= 0; i--) {
+            var ms = messages[i];
+            addMessage(ms.nick, ms.text || "", ms.timestamp, ms.type);
           };
         } else {
           if ( msg ){
