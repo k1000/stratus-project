@@ -7,6 +7,7 @@ from django.conf import settings
 
 #https://github.com/gabrielfalcao/tornadio-chat/blob/master/app/server.py
 #http://djay.posterous.com/how-to-make-a-realtime-chat-app-using-tornado-0
+from stratus.signals import commit
 
 CHANNELS = {}
 #
@@ -34,7 +35,6 @@ class Channel(object) :
     def size(self) :
         return 1024
 
-
 def get_channel(name):
     if name not in CHANNELS.keys():
         CHANNELS[name]=Channel()
@@ -46,6 +46,10 @@ class ChatConnection(tornadio.SocketConnection):
     participants = {}
     nick = ""
     room = ""
+
+    def __init__(self, *args, **kwargs) :
+        commit.connect(self.on_signal)
+        return super(ChatConnection, self ).__init__(*args, **kwargs)
 
     def on_open(self, *args, **kwargs):
         pass
@@ -103,15 +107,39 @@ class ChatConnection(tornadio.SocketConnection):
         channel = get_channel(self.room)
         messages = channel._messages
         self.send( {"messages":messages } )
+        self.send(dict(
+                    msg ="users "
+                    ,type="who"
+                    ,who = self.who( self.room )
+                    ,nick=self.nick
+                    ,room=self.room
+                ))
         return msg
 
     def on_close(self):
         del self.participants[self.nick]
-        self.broadcast( "A user %s has left." % self.nick, self.room )
+        msg = dict(
+            msg ="%s has left." % self.nick 
+            ,type="info"
+            ,nick=self.nick
+            ,room=self.room
+        )
+        self.broadcast( msg, self.room )
+    
+    def on_signal(sender, **kwargs):
+        print kwargs
+        self.broadcast( **kwargs )
 
     @classmethod
-    def who(cls) :
-        return [ s.nick for s in self.participants ]
+    def send_msg(cls, msssage, room=None):
+        cls.broadcast( msg, self.room )
+
+    @classmethod
+    def who(cls, room=None) :
+        if room:
+            return [name for name, participant in cls.participants.items() if participant.room == room ]
+        else:
+            return cls.participants.keys()
 
 
 

@@ -23,7 +23,7 @@ class Command(BaseCommand):
             dest='flash_policy_file', default=False,
             help="Location of 'flash_policy_file' "),
         #make_option('--adminmedia', dest='admin_media_path', default='',
-        #    help="Specifies the directory from which to serve admin media."),
+        #   help="Specifies the directory from which to serve admin media."),
         make_option('--noxheaders', action='store_false',
             dest='xheaders', default=True,
             help="Tells Tornado to NOT override remote IP with X-Real-IP."),

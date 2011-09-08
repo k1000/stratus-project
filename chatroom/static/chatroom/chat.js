@@ -18,40 +18,11 @@ function updateUsersLink ( ) {
   $("#usersLink").text(t);
 }
 
-//handles another person joining chat
-function userJoin(nick, timestamp) {
-  //put it in the stream
-  addMessage(nick, "joined", timestamp, "join");
-  //if we already know about this user, ignore it
-  for (var i = 0; i < nicks.length; i++)
-    if (nicks[i] == nick) return;
-  //otherwise, add the user to the list
-  nicks.push(nick);
-  //update the UI
-  updateUsersLink();
-}
-
-//handles someone leaving
-function userPart(nick, timestamp) {
-  //put it in the stream
-  addMessage(nick, "left", timestamp, "part");
-  //remove the user from the list
-  for (var i = 0; i < nicks.length; i++) {
-    if (nicks[i] == nick) {
-      nicks.splice(i,1)
-      break;
-    }
-  }
-  //update the UI
-  updateUsersLink();
-}
-
 //used to keep the most recent messages visible
 function scrollDown () {
   var objDiv = document.getElementById("log");
   objDiv.scrollTop = objDiv.scrollHeight;
 }
-
 
 // utility functions
 
@@ -106,7 +77,7 @@ function addMessage (from, text, time, _class) {
     time = new Date();
   } else if ((time instanceof Date) === false) {
     // if it's a timestamp, interpret it
-    time = new Date(time);
+    time = new Date(time * 1000);
   }
 
   //every message you see is actually a table with 3 cols:
@@ -143,26 +114,10 @@ function addMessage (from, text, time, _class) {
   $(messageElement).appendTo( $("#log") )
       .animate({ backgroundColor: "#FCFCD8" },1).delay(1000).animate({ backgroundColor: "#EFEAEA" }, 1500);
 
-
   //always view the most recent message when it is added
   scrollDown();
 }
 
-//add a list of present chat members to the stream
-function outputUsers () {
-  var nick_string = nicks.length > 0 ? nicks.join(", ") : "(none)";
-  addMessage("users:", nick_string, new Date(), "info");
-  return false;
-}
-
-//get a list of the users presently in the room, and add it to the stream
-function who () {
-  jQuery.get(CONFIG.dir +"/who", {room:REPO}, function (data, status) {
-    if (status != "success") return;
-    nicks = data.nicks;
-    outputUsers();
-  }, "json");
-}
 
 
 
@@ -181,6 +136,7 @@ $(document).ready(function() {
       //userJoin(message.nick, message.timestamp);
     };
     onmessage = function (msg) {
+        
         if ( msg.messages){
           messages = msg.messages.reverse();
           for (var i = messages.length - 1; i >= 0; i--) {
@@ -188,9 +144,12 @@ $(document).ready(function() {
             addMessage(ms.nick, ms.text || "", ms.timestamp, ms.type);
           };
         } else {
-          if ( msg ){
+            if ( msg.type == "who"){
+              nicks = msg.who;
+              updateUsersLink()
+              msg.msg = "connected users: " + msg.who.join(" ");
+            }
             addMessage(msg.nick, msg.msg, msg.timestamp, msg.type);
-          }
         }
     };
     onclose = function(message) {
