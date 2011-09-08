@@ -10,7 +10,7 @@ urlpatterns = patterns('',
     # url(r'^$', 'stratusproject.views.home', name='home'),
     # url(r'^stratusproject/', include('stratusproject.foo.urls')),
 
-    # Uncomment the admin/doc line below to enable admin documentation:
+    # Uncomment thedd admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
 
     # Uncomment the next line to enable the admin:
