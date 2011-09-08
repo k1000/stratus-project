@@ -114,28 +114,30 @@ function addMessage (from, text, time, _class) {
   //  the time,
   //  the person who caused the event,
   //  and the content
-  var messageElement = $(document.createElement("table"));
+  var messageElement = $(document.createElement("div"));
 
   messageElement.addClass("message");
-  if (_class)
-    messageElement.addClass(_class);
+
+  // If the current user said this, add a special css class
+  var nick_re = new RegExp(USER_NAME);
+  if (nick_re.exec(text)) 
+      messageElement.addClass("personal");
+  if (USER_NAME == from ) 
+      messageElement.addClass("self");
+  if (_class) 
+      messageElement.addClass(_class);
 
   // sanitize
   text = util.toStaticHTML(text);
 
-  // If the current user said this, add a special css class
-  var nick_re = new RegExp(CONFIG.nick);
-  if (nick_re.exec(text))
-    messageElement.addClass("personal");
-
   // replace URLs with links
   text = text.replace(util.urlRE, '<a target="_blank" href="$&">$&</a>');
 
-  var content = '<tr>'
-              + '  <td class="date">' + util.timeString(time) + '</td>'
-              + '  <td class="nick">' + util.toStaticHTML(from) + '</td>'
-              + '  <td class="msg-text">' + text  + '</td>'
-              + '</tr>'
+  var content = '<div class="meta">'
+              + '  <em class="nick">' + util.toStaticHTML(from) + '</em>'
+              + '  <date>' + util.timeString(time) + '</date>'
+              + '</div>'
+              + '<p class="msg-text">' + text  + '</p>'
               ;
   messageElement.html(content);
 
@@ -146,11 +148,10 @@ function addMessage (from, text, time, _class) {
   scrollDown();
 }
 
-
 //add a list of present chat members to the stream
 function outputUsers () {
   var nick_string = nicks.length > 0 ? nicks.join(", ") : "(none)";
-  addMessage("users:", nick_string, new Date(), "notice");
+  addMessage("users:", nick_string, new Date(), "info");
   return false;
 }
 
@@ -176,12 +177,19 @@ $(document).ready(function() {
     });
 
     onopen = function() {
-      send( {"join":USER_NAME, "room":REPO });
+      send( {"nick":USER_NAME, "room":REPO, "type":"join" });
       //userJoin(message.nick, message.timestamp);
     };
     onmessage = function (msg) {
-        if ( msg ){
-          addMessage(msg.nick, msg.msg, msg.timestamp);
+        if ( msg.messages){
+          for (var i = msg.messages.length - 1; i >= 0; i--) {
+            var ms = msg.messages[i];
+            addMessage(ms.nick, ms.msg || "", ms.timestamp, ms.type);
+          };
+        } else {
+          if ( msg ){
+            addMessage(msg.nick, msg.msg, msg.timestamp, msg.type);
+          }
         }
     };
     onclose = function(message) {

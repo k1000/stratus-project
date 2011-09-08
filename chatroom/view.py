@@ -16,8 +16,8 @@ class Channel(object) :
         self._messages = []
         self._callbacks = []
 
-    def message(self, type, nick, text="") :
-        m = { 'type': type, 'timestamp' : int(time.time()), 'text' : text, 'nick' : nick }
+    def message(self, type, nick, msg="") :
+        m = { 'type': type, 'timestamp' : int(time.time()), 'text' : msg, 'nick' : nick }
 
         for cb in self._callbacks :
             cb([m])
@@ -34,47 +34,78 @@ class Channel(object) :
     def size(self) :
         return 1024
 
-        
+
+def get_channel(name):
+    if name not in CHANNELS.keys():
+        CHANNELS[name]=Channel()
+    
+    return CHANNELS.get( name )
+         
 class ChatConnection(tornadio.SocketConnection):
     # Class level variable
-    participants = set()
+    participants = {}
     nick = ""
     room = ""
 
     def on_open(self, *args, **kwargs):
-        self.participants.add(self)
+        pass
         # send participants in the room
         #self.send("{text:'Welcome!'}")
 
     def on_message(self, message):
         #msg = simplejson.load( message )
+        but_me=False
+
+        nick = message.get("nick")
+
+        # join or rejoin 
+        if nick not in self.participants or self.participants.get(nick) is not self:
+            message = self.join( message )
+        
+        if "timestamp" not in message:
+            message["timestamp"] = int(time.time())
+
         if settings.DEBUG:
+            print self.participants.keys()
             print message
 
-        if "join" in message:
-            self.nick = message.get("join")
-            self.room = message.get("room")
-
-        message["timestamp"] = int(time.time())
-        self.broadcast( message, message.get("room") )
-
-    def broadcast(self, msg, room=None):
-        if room:
-            for p in self.participants:
-                if p.room == room:
-                    p.send(msg)
-        else:
-            for p in self.participants:
-                p.send(msg)
+        self.broadcast( message, self.room, but_me )
     
-    def send_private( msg, to):
-        for p in self.participants:
-            if p.nick == to:
-                p.send(msg)
-                return
-                
+    def broadcast(self, msg, room=None, but_me=False):
+        participants = self.participants
+        if but_me:
+            del participants[ self.nick ]
+        #send_to = filter(lambda p: not p.is_closed, participants.values())
+        send_to = participants.values()
+
+        if room:
+            send_to = filter(lambda p: p.room is room, send_to)
+            channel = get_channel(room)
+            channel.message( msg.get("type"), msg.get("nick"), msg.get("msg") )
+            
+        if settings.DEBUG:
+            print send_to
+        
+        map(lambda p: p.send(msg), self.participants.values())
+    
+    def send_private( self, msg, to):
+        self.participants[to].send(msg)
+    
+    def join( self, msg):
+        self.nick = msg.get("nick")
+        self.room = msg.get("room")
+        self.participants[self.nick] = self
+        msg.update(dict(
+            msg = "%s joined" % self.nick,
+            type = "info"
+        ))
+        
+        channel = get_channel(self.room)
+        self.send( {"messages":channel._messages} )
+        return msg
+
     def on_close(self):
-        self.participants.remove(self)
+        del self.participants[self.nick]
         self.broadcast( "A user %s has left." % self.nick, self.room )
 
     @classmethod
